@@ -8,6 +8,8 @@ ITensors = "9136182c-28ba-11e9-034c-db9fb085ebd5"
 MPSDynamics = "8fc8f346-e1eb-498f-94db-02ffe92d8134"
 Makie = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
 PackageCompiler = "9b87118b-4619-50d2-8e1e-99f35a4d4d9d"
+ProfileSVG = "132c30aa-f267-4189-9183-c8a63c7e05e6"
+ProfileView = "c46f51b8-102a-5cf2-8d2c-8597cb0e0da7"
 QuantumToolbox = "6c2fb7c5-b903-41d2-bc5e-5a7c320b9fab"
 SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 
