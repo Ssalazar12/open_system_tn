@@ -2,9 +2,11 @@ name = "open_system_tn"
 
 [deps]
 CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
+Cthulhu = "f68482b8-f384-11e8-15f7-abe071a5a75f"
 DrWatson = "634d3b9d-ee7a-5ddf-bec9-22491ea816e1"
 ITensorMPS = "0d1a4710-d33b-49a5-8f18-73bdf49b47e2"
 ITensors = "9136182c-28ba-11e9-034c-db9fb085ebd5"
+JET = "c3a54625-cd67-489e-a8e7-0a5a0ff4e31b"
 MPSDynamics = "8fc8f346-e1eb-498f-94db-02ffe92d8134"
 Makie = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
 PackageCompiler = "9b87118b-4619-50d2-8e1e-99f35a4d4d9d"
