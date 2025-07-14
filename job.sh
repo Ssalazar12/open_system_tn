@@ -7,8 +7,8 @@
 # folder MUST EXIST!
 #$ -e logs/ # give absolut path to the desired location
 #$ -o logs/
-#$ -l h_vmem=16G
+#$ -l h_vmem=24G
+#$ -pe mpi 15
 # start program, if excecutable of course just call it
-module load conda
-source activate qpc_venv
-python /home/user/santiago.salazar-jaramillo/hoping_tensors/scripts/QPC_dd_sim.py
+module load julia
+julia --threads 15 /home/user/santiago.salazar-jaramillo/open_system_tn/scripts/kerr_cavities.jl

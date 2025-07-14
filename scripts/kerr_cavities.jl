@@ -13,14 +13,14 @@ using ITensors, ITensorMPS
 using Strided
 
 
-N = 3 # local hilbert space dimension
+N = 5 # local hilbert space dimension
 L = 10 # size of the chain
 ω = 2.5 # frequency of the harmonic oscillator
 J = 2.0 # hopping
 γ = 1.0 # damping rate
 γ_list = γ.*ones(L)
 U = 0.1 # Kerr non-linearity
-F_list = [5]
+F_list = [0.1]
 maxt = 10.0 # maximum time
 # Do an ensemble average over all trajectories to get the actual occupatinos
 N_trajectories = 2
@@ -232,7 +232,12 @@ for F in F_list
     mean_corr = mean(correlation_ensemble)
 
     # vuild file and metadata
-    str_file_name = @sprintf("../data/sims/benchmark/%s_N%i_L%i_om%.2f_J%.2f_gamma%.2f_kerr%.2f_drive%.2f_maxt%.2f_deltat%.2f_traj%i_cutexp%i.h5", 
+
+    #str_file_name = @sprintf("../data/sims/benchmark/%s_N%i_L%i_om%.2f_J%.2f_gamma%.2f_kerr%.2f_drive%.2f_maxt%.2f_deltat%.2f_traj%i_cutexp%i.h5", 
+    #                        evol_type,N,L,ω,J,γ,U,F,maxt,Delta_t, N_trajectories, cutoff_exponent)
+
+    # for cluster use 
+    str_file_name = @sprintf("/home/user/santiago.salazar-jaramillo/open_system_tn/data/sims/benchmark/%s_N%i_L%i_om%.2f_J%.2f_gamma%.2f_kerr%.2f_drive%.2f_maxt%.2f_deltat%.2f_traj%i_cutexp%i.h5",
                             evol_type,N,L,ω,J,γ,U,F,maxt,Delta_t, N_trajectories, cutoff_exponent)
 
     param_dict = Dict("type"=>evol_type,"N"=>N, "L"=>L, "omega" =>ω,"J" =>J,"gamma"=>γ ,"U"=>U ,"F"=>F ,
