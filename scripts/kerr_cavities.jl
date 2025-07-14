@@ -20,10 +20,17 @@ J = 2.0 # hopping
 γ = 1.0 # damping rate
 γ_list = γ.*ones(L)
 U = 0.1 # Kerr non-linearity
+<<<<<<< Updated upstream
 F_list = [0.1, 5]
 maxt = 10.0 # maximum time
 # Do an ensemble average over all trajectories to get the actual occupatinos
 N_trajectories = 100
+=======
+F_list = [5]
+maxt = 10.0 # maximum time
+# Do an ensemble average over all trajectories to get the actual occupatinos
+N_trajectories = 2
+>>>>>>> Stashed changes
 cutoff_exponent = -18 # -18 -20
 cutoff = 10.0^(cutoff_exponent)
 Delta_t = 0.2
@@ -211,7 +218,8 @@ for F in F_list
 
     # use @elapsed to save the result of the time measurement macro
 
-    Threads.@threads for traj in 1:N_trajectories
+    for traj in 1:N_trajectories
+
         timings[traj] = @elapsed occupations, Svns, bond_dim, correlation_matrix, a_operators = compute_trajectory_tebd(s_indices, gates, L, J,
                                 Delta_t, maxt, N, γ_list, cutoff);
         occupations = reduce(hcat, occupations);
