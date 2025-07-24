@@ -1,0 +1,10 @@
+  Activating project at `~/open_system_tn`
+ERROR: LoadError: ParseError:
+# Error @ /home/user/santiago.salazar-jaramillo/open_system_tn/scripts/kerr_cavities2.jl:23:28
+U = 0.1 # Kerr non-linearity
+F_list =  1.4 ,1.6, 1.8,1.9]
+#                          ╙ ── extra tokens after end of expression
+Stacktrace:
+ [1] top-level scope
+   @ ~/open_system_tn/scripts/kerr_cavities2.jl:23
+in expression starting at /home/user/santiago.salazar-jaramillo/open_system_tn/scripts/kerr_cavities2.jl:23

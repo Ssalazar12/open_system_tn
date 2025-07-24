@@ -20,7 +20,7 @@ J = 2.0 # hopping
 γ = 1.0 # damping rate
 γ_list = γ.*ones(L)
 U = 0.1 # Kerr non-linearity
-F_list = [0.2, 0.4, 0.7, 0.8, 1.0, 1.2, 1.4 ,1.6, 1.8,1.9]
+F_list =  1.4 ,1.6, 1.8,1.9]
 maxt = 11.0 # maximum time
 # Do an ensemble average over all trajectories to get the actual occupatinos
 N_trajectories = 1000
