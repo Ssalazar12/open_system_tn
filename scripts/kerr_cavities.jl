@@ -20,13 +20,13 @@ J = 2.0 # hopping
 γ = 1.0 # damping rate
 γ_list = γ.*ones(L)
 U = 0.1 # Kerr non-linearity
-F_list = [ 1.5, 2.0, 2.5, 3.0, 5.0]
-maxt = 11.0 # maximum time
+F_list = [0.1, 0.5, 1.0 1.5, 2.0, 2.5, 3.0, 3.5 ,4.5 ,5.0]
+maxt = 20.0 # maximum time
 # Do an ensemble average over all trajectories to get the actual occupatinos
 N_trajectories = 1000
 cutoff_exponent = -18 # -18 -20
 cutoff = 10.0^(cutoff_exponent)
-Delta_t = 0.2
+Delta_t = 0.1
 time_list = 0.0:Delta_t:maxt
 γ_list = γ.*ones(L)
 evol_type = "TEBD" #"TE
@@ -231,7 +231,7 @@ for F in F_list
     tot_oc = sum(mean_traj, dims=1)[1:end]
     mean_corr = mean(correlation_ensemble)
 
-    # vuild file and metadata
+    # build file and metadata
 
     #str_file_name = @sprintf("../data/sims/benchmark/%s_N%i_L%i_om%.2f_J%.2f_gamma%.2f_kerr%.2f_drive%.2f_maxt%.2f_deltat%.2f_traj%i_cutexp%i.h5", 
     #                        evol_type,N,L,ω,J,γ,U,F,maxt,Delta_t, N_trajectories, cutoff_exponent)
