@@ -13,20 +13,20 @@ using ITensors, ITensorMPS
 using Strided
 
 
-N = 5 # local hilbert space dimension
+N = 4 # local hilbert space dimension
 L = 10 # size of the chain
 ω = 2.5 # frequency of the harmonic oscillator
 J = 2.0 # hopping
 γ = 1.0 # damping rate
 γ_list = γ.*ones(L)
 U = 0.1 # Kerr non-linearity
-F_list = [ 1.5, 2.0, 2.5, 3.0, 5.0]
-maxt = 11.0 # maximum time
+F_list = [0.5,1.1]
+maxt = 30.0 # maximum time
 # Do an ensemble average over all trajectories to get the actual occupatinos
-N_trajectories = 1000
-cutoff_exponent = -18 # -18 -20
+N_trajectories = 500
+cutoff_exponent = -18 #
 cutoff = 10.0^(cutoff_exponent)
-Delta_t = 0.2
+Delta_t = 0.1
 time_list = 0.0:Delta_t:maxt
 γ_list = γ.*ones(L)
 evol_type = "TEBD" #"TE
@@ -134,11 +134,12 @@ function compute_trajectory_tebd(s::Vector{Index{Int64}}, gates::Vector{ITensor}
     occupations = Vector{Vector{Float64}}(undef, n_tsteps)
     corr_matrices = Vector{Matrix{ComplexF64}}(undef, n_tsteps)
     entropies = zeros(n_tsteps)
+    entropies_half = zeros(n_tsteps)
     bond_dimensions = zeros(Int, n_tsteps)
     # for the wigner distributions
     a_operators = Vector{Vector{ComplexF64}}(undef, n_tsteps)
 
-    # put a particle in the first site
+    # initial state
     state_list = ["0" for n in 1:L]
     state_list[1] = "0"
     psi = MPS(s, state_list)
@@ -153,11 +154,10 @@ function compute_trajectory_tebd(s::Vector{Index{Int64}}, gates::Vector{ITensor}
         # save observables of interest
         occupations[dummy_counter] = ITensorMPS.expect(psi,"N")    
         corr_matrices[dummy_counter] = correlation_matrix(psi,"adag","a")
-        entropies[dummy_counter] = entangement_S(psi, round(Int64, L/2))
+        entropies[dummy_counter] = entangement_S(psi, round(Int64, 2))
+        entropies_half[dummy_counter] = entangement_S(psi, round(Int64, L/2))
         bond_dimensions[dummy_counter] = ITensorMPS.maxlinkdim(psi)
         a_operators[dummy_counter] = ITensorMPS.expect(psi,"a") 
-
-        # t≈ttotal && break
 
         # metropolis step
         psi_cand = apply(gates, psi; cutoff) # candidate for new state}
@@ -175,7 +175,7 @@ function compute_trajectory_tebd(s::Vector{Index{Int64}}, gates::Vector{ITensor}
         dummy_counter+=1
     end
 
-    return occupations, entropies, bond_dimensions, corr_matrices, a_operators
+    return occupations, entropies, entropies_half, bond_dimensions, corr_matrices, a_operators
 end
 
 
@@ -202,6 +202,7 @@ for F in F_list
     occupation_ensemble = Vector{Matrix{Float64}}(undef, N_trajectories)
     correlation_ensemble = Vector{Vector{Matrix{ComplexF64}}}(undef, N_trajectories)
     entropy_ensemble = zeros(N_trajectories, length(time_list))
+    entropy_half_ensemble = zeros(N_trajectories, length(time_list))
     b_dims_ensemble = zeros(N_trajectories, length(time_list))
     a_ensemble = Vector{Vector{Vector{ComplexF64}}}(undef, N_trajectories)
     s_indices, gates = build_TEBD(L, ω, U, J, F, Delta_t, N, γ_list)
@@ -213,11 +214,12 @@ for F in F_list
 
     for traj in 1:N_trajectories
 
-        timings[traj] = @elapsed occupations, Svns, bond_dim, correlation_matrix, a_operators = compute_trajectory_tebd(s_indices, gates, L, J,
+        timings[traj] = @elapsed occupations, Svns,Svnhalf, bond_dim, correlation_matrix, a_operators = compute_trajectory_tebd(s_indices, gates, L, J,
                                 Delta_t, maxt, N, γ_list, cutoff);
         occupations = reduce(hcat, occupations);
         occupation_ensemble[traj] = occupations
         entropy_ensemble[traj, 1:end] = Svns
+        entropy_half_ensemble[traj, 1:end] = Svnhalf
         b_dims_ensemble[traj, 1:end] = bond_dim
         correlation_ensemble[traj] = correlation_matrix
         a_ensemble[traj] = a_operators
@@ -227,18 +229,18 @@ for F in F_list
     # average over trajectories when necessary
     mean_traj = mean(occupation_ensemble)
     mean_entropy = mean(entropy_ensemble,dims=1)[1,1:end]
+    mean_half_entropy = mean(entropy_half_ensemble,dims=1)[1,1:end]
     mean_bond = mean(b_dims_ensemble,dims=1)[1,1:end]
     tot_oc = sum(mean_traj, dims=1)[1:end]
     mean_corr = mean(correlation_ensemble)
 
-    # vuild file and metadata
-
-    #str_file_name = @sprintf("../data/sims/benchmark/%s_N%i_L%i_om%.2f_J%.2f_gamma%.2f_kerr%.2f_drive%.2f_maxt%.2f_deltat%.2f_traj%i_cutexp%i.h5", 
-    #                        evol_type,N,L,ω,J,γ,U,F,maxt,Delta_t, N_trajectories, cutoff_exponent)
-
-    # for cluster use 
-    str_file_name = @sprintf("/home/user/santiago.salazar-jaramillo/open_system_tn/data/sims/benchmark/%s_N%i_L%i_om%.2f_J%.2f_gamma%.2f_kerr%.2f_drive%.2f_maxt%.2f_deltat%.2f_traj%i_cutexp%i.h5",
+    # build file and metadata
+    str_file_name = @sprintf("../data/sims/N=4_L=10/%s_N%i_L%i_om%.2f_J%.2f_gamma%.2f_kerr%.2f_drive%.2f_maxt%.2f_deltat%.2f_traj%i_cutexp%i.h5", 
                             evol_type,N,L,ω,J,γ,U,F,maxt,Delta_t, N_trajectories, cutoff_exponent)
+
+    ## for cluster use 
+    #str_file_name = @sprintf("/home/user/santiago.salazar-jaramillo/open_system_tn/data/sims/benchmark/%s_N%i_L%i_om%.2f_J%.2f_gamma%.2f_kerr%.2f_drive%.2f_maxt%.2f_deltat%.2f_traj%i_cutexp%i.h5",
+    #                        evol_type,N,L,ω,J,γ,U,F,maxt,Delta_t, N_trajectories, cutoff_exponent)
 
     param_dict = Dict("type"=>evol_type,"N"=>N, "L"=>L, "omega" =>ω,"J" =>J,"gamma"=>γ ,"U"=>U ,"F"=>F ,
                     "maxt"=>maxt, "N_trajectories"=>N_trajectories, "cutoff"=>cutoff, "delta_t" =>Delta_t,
@@ -256,7 +258,8 @@ for F in F_list
         # save the results
         res_g = create_group(fid, "results")
         res_g["occupations"] = mean_traj
-        res_g["entropy_first_to_half"] = mean_entropy
+        res_g["entropy_first"] = mean_entropy
+        res_g["entropy_first_to_half"] = mean_half_entropy
         res_g["bond_dimension"] = mean_bond 
         # for the matrices we have to save them as a tensor where time is one of the indices
         res_g["twobody_correlation"] = cat(mean_corr...; dims=3)   
